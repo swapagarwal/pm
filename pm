@@ -3,10 +3,9 @@
 set -e
 
 LOG=${LOGFILE-$HOME/.pm.log}
+CONFIG=${CONFIGFILE-$(pwd)/pm.config}
 
-# Define your password schemes here
-# STR and NUM will be calculated according to input
-myPassword=( "pass" "STR" "NUM" "word" )
+source $CONFIG
 
 # Functions used to generate the new password
 # Feel free to add your own
@@ -37,11 +36,11 @@ function changePassword
   echo "Changing password of $USER_NAME from $CURRENT_PASSWORD to $NEW_PASSWORD" >> "$LOG"
   expect <<END
     spawn passwd $USER_NAME
-    expect "password:"
+    expect "*?assword:"
     send "$CURRENT_PASSWORD\r"
-    expect "password:"
+    expect "*?assword:"
     send "$NEW_PASSWORD\r"
-    expect "password:"
+    expect "*?assword:"
     send "$NEW_PASSWORD\r"
     expect eof
 END
@@ -88,6 +87,6 @@ case "$1" in
     checkScheme "${@:2}"
     ;;
   *)
-    changePassword "$@"
+    #changePassword "$@"
     ;;
 esac
