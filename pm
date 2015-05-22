@@ -86,7 +86,15 @@ case "$1" in
   scheme | s)
     checkScheme "${@:2}"
     ;;
-  *)
-    #changePassword "$@"
+  test | t)
+    changePassword "${@:2}"
+    ;;
+  help | h | *)
+    echo "usage: pm [command]"
+    echo
+    echo "Available commands:"
+    echo "  scheme [schemeName] [arguments]"
+    echo "  test [username] [current password] [new password]"
+    echo "  help (default)"
     ;;
 esac
