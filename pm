@@ -50,20 +50,24 @@ function generateNewPassword
 {
   new_pass=""
   arg_no=1
-  for i in "${str[@]}"
+  args=${!scheme}
+  for (( i=1; i<=args; i++ ));
   do
-    if [ "$i" == "STR" ]; then
+    def=$scheme"_"$i"_def"
+    func=$scheme"_"$i"_func"
+    if [[ "${!def}" == "STR" || "${!def}" == "NUM" ]]; then
+      if [[ $# -lt $arg_no ]]; then
+        echo "Too few parameters!"
+        exit 2
+      fi
       eval tmp=\${$arg_no}
       ((arg_no+=1))
-      # todo - apply functions (maybe, chain?)
-      new_pass+=$tmp
-    elif [ "$i" == "NUM" ]; then
-      eval tmp=\${$arg_no}
-      ((arg_no+=1))
-      # todo - apply functions (maybe, chain?)
+      tmp=$(${!func} $tmp)
+      # todo - separate STR/NUM
+      # todo - chain functions?
       new_pass+=$tmp
     else
-      new_pass+=$i
+      new_pass+=${!def}
     fi
   done
   read -p "Enter username:" user
@@ -73,8 +77,8 @@ function generateNewPassword
 
 function checkScheme
 {
-  eval str=("\${$1[@]}")
-  if [ -z "${str}" ]; then
+  scheme=$1
+  if [ -z "${!scheme}" ]; then
     echo "$1 doesn't exist"
     exit 1
   fi
@@ -93,7 +97,7 @@ case "$1" in
     echo "usage: pm [command]"
     echo
     echo "Available commands:"
-    echo "  scheme [schemeName] [arguments]"
+    echo "  scheme [schemeName] [arguments(STR/NUM)]..."
     echo "  test [username] [current password] [new password]"
     echo "  help (default)"
     ;;
